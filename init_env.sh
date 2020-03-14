@@ -99,6 +99,17 @@ check_install_path() {
     echo $ins_path > /root/tenon.path
 }
 
+keep_auto_start() {
+    cp ./check_net.sh /root
+    cp ./restart.sh /root
+    rand_s=`tr -dc "0-9" < /dev/urandom | head -c 2`
+    rand_m=`echo $rand_s | awk '{print int($0)}'`
+    rand_mb=$(( $rand_m % 60 ))
+    echo "* * * * * cd /root && sudo sh check_net.sh" > /var/spool/cron/root
+    echo "${rand_mb} 13 * * * cd /root && sudo sh check_net.sh" > /var/spool/cron/root
+    echo "" > /var/spool/cron/root
+}
+
 install(){
         check_install_path
 	check_system
@@ -107,6 +118,7 @@ install(){
 	check_kernel
 	init_config
 	init_firewall
+        keep_auto_start
 	reboot
 }
 

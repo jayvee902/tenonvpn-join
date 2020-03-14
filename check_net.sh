@@ -21,7 +21,7 @@ echo $ins_path
 echo $idx
 if [ "$idx" -eq "10" ]; then
     echo "restart net"
-    cd $ins_path && sh start_node.sh
+    sh restart.sh
 fi
 iptables -F
 
