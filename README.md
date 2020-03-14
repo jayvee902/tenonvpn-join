@@ -8,17 +8,13 @@
 
       git https://github.com/tenondvpn/tenonvpn-join.git
       or
-      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.3.zip
+      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.4.zip
 
 ### 2. init system, system will restart after execution
 
       sh init_env.sh
 
-### 3. (optional step), set your own private key (is the private key, not the account address), all nodes share incentives will be sent to this account address 
-
-      sh set_private_key.sh private_key
-
-### 4. start node: 
+### 3. start node: 
 
       sh start_node.sh
 
@@ -36,17 +32,14 @@
   
       git clone https://github.com/tenondvpn/tenonvpn-join.git
       或者
-      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.3.zip
+      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.4.zip
    
 
 ### 2. 初始化环境，执行完成后会重启系统
       sh init_env.sh  
    
    
-### 3. （可选步骤）， 设置自己的私钥（是私钥不是账号地址），所有节点共享激励将发送到这个账户地址
-      sh set_private_key.sh 私钥
-   
-### 4. 启动节点：
+### 3. 启动节点：
       sh start_node.sh
 
     
