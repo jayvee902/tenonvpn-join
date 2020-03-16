@@ -10,13 +10,10 @@
       or
       wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.5.zip
 
-### 2. init system, system will restart after execution
+### 2. init system, system will restart after execution， node will start automatically
 
       sh init_env.sh
 
-### 3. start node: 
-
-      sh start_node.sh
 
 # 
 # 
@@ -35,12 +32,8 @@
       wget https://github.com/tenondvpn/tenonvpn-join/archive/1.0.5.zip
    
 
-### 2. 初始化环境，执行完成后会重启系统
+### 2. 初始化环境，执行完成后会重启系统，程序也会自动启动
       sh init_env.sh  
-   
-   
-### 3. 启动节点：
-      sh start_node.sh
 
     
     
