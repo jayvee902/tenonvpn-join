@@ -1,102 +1,99 @@
-#!/bin/bash
+#!/usr/bin/env bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
-#yum install -f wget gcc gcc-c++ gcc-g77 flex bison autoconf automake bzip2-devel zlib-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
-
-check_system(){
-	[[ -z "`cat /etc/redhat-release | grep -iE "CentOS"`" ]] && echo -e "${Error} only support CentOS !" && exit 1
-	[[ ! -z "`cat /etc/redhat-release | grep -iE " 7."`" ]] && bit=7
-	[[ ! -z "`cat /etc/redhat-release | grep -iE " 6."`" ]] && bit=6
-	[[ "`uname -m`" != "x86_64" ]] && echo -e "${Error} only support 64bit !" && exit 1
+check_sys(){
+	if [[ -f /etc/redhat-release ]]; then
+		release="centos"
+	elif cat /etc/issue | grep -q -E -i "debian"; then
+		release="debian"
+	elif cat /etc/issue | grep -q -E -i "ubuntu"; then
+		release="ubuntu"
+	elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
+		release="centos"
+	elif cat /proc/version | grep -q -E -i "debian"; then
+		release="debian"
+	elif cat /proc/version | grep -q -E -i "ubuntu"; then
+		release="ubuntu"
+	elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
+		release="centos"
+    fi
 }
 
-check_root(){
-	[[ "`id -u`" != "0" ]] && echo -e "${Error} must be root user !" && exit 1
-}
-
-check_kvm(){
-	yum update -y
-	yum install -y virt-what net-tools
-	[[ "`virt-what`" != "kvm" ]] && echo -e "${Error} only support KVM !" && exit 1
-}
-
-install_image(){
-	yum  install -y ./kernel/kernel-ml-4.12.10-1.el7.elrepo.x86_64.rpm
-}
-install_devel(){
-	yum  install -y ./kernel/kernel-ml-devel-4.12.10-1.el7.elrepo.x86_64.rpm
-}
-install_headers(){
-	yum  install -y ./kernel/kernel-ml-headers-4.12.10-1.el7.elrepo.x86_64.rpm
-}
-
-update_grub(){
-	[[ "${bit}" = "7" ]] && grub2-mkconfig -o /boot/grub2/grub.cfg && grub2-set-default 0
-	[[ "${bit}" = "6" ]] && sed -i '/default=/d' /boot/grub/grub.conf && echo -e "\ndefault=0\c" >> /boot/grub/grub.conf
-}
-
-check_kernel(){
-	already_image=`rpm -qa | grep kernel-4.12.10`
-	already_devel=`rpm -qa | grep kernel-devel-4.12.10`
-	already_headers=`rpm -qa | grep kernel-headers-4.12.10`
-
-	delete_surplus_1
-
-	if [[ -z "${already_image}" ]]; then
-		 echo -e "${Info} installing image" && install_image
-	else echo -e "${Info} noneed install image"
+check_version(){
+	if [[ -s /etc/redhat-release ]]; then
+		version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+	else
+		version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
 	fi
-
-	if [[ -z "${already_devel}" ]]; then
-		 echo -e "${Info} installing devel" && install_devel
-	else echo -e "${Info} noneed install devel"
+	bit=`uname -m`
+	if [[ ${bit} = "x86_64" ]]; then
+		bit="x64"
+	else
+		bit="x32"
 	fi
+}
 
-	if [[ -z "${already_headers}" ]]; then
-		 echo -e "${Info} installing headers" && install_headers
-	else echo -e "${Info} noneed install headers"
+BBR_grub(){
+	if [[ "${release}" == "centos" ]]; then
+        if [[ ${version} = "6" ]]; then
+            if [ ! -f "/boot/grub/grub.conf" ]; then
+                echo -e "${Error} /boot/grub/grub.conf 找不到，请检查."
+                exit 1
+            fi
+            sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
+        elif [[ ${version} = "7" ]]; then
+            if [ ! -f "/boot/grub2/grub.cfg" ]; then
+                echo -e "${Error} /boot/grub2/grub.cfg 找不到，请检查."
+                exit 1
+            fi
+            grub2-set-default 0
+        fi
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+        /usr/sbin/update-grub
+    fi
+}
+
+installbbrplus(){
+	if [[ "${release}" == "centos" ]]; then
+		yum install -y ./pkgs/kernel-headers-4.14.129-bbrplus.rpm
+		yum install -y ./pkgs/kernel-4.14.129-bbrplus.rpm
+	elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+		dpkg -i ./pkgs/linux-headers-4.14.129-bbrplus.deb
+		dpkg -i ./pkgs/linux-image-4.14.129-bbrplus.deb
 	fi
-
-	update_grub
+	BBR_grub
 }
 
-init_config(){
-    echo "fs.file-max = 1024000" >> /etc/sysctl.conf
-    echo "net.core.rmem_max = 67108864" >> /etc/sysctl.conf
-    echo "net.core.wmem_max = 67108864" >> /etc/sysctl.conf
-    echo "net.core.rmem_default = 65536" >> /etc/sysctl.conf
-    echo "net.core.wmem_default = 65536" >> /etc/sysctl.conf
-    echo "net.core.netdev_max_backlog = 4096" >> /etc/sysctl.conf
-    echo "net.core.somaxconn = 4096" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_tw_reuse = 1" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_tw_recycle = 0" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_fin_timeout = 30" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_keepalive_time = 1200" >> /etc/sysctl.conf
-    echo "net.ipv4.ip_local_port_range = 10000 65000" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_max_syn_backlog = 4096" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_max_tw_buckets = 5000" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_rmem = 4096 87380 67108864" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_wmem = 4096 65536 67108864" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_mtu_probing = 1" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_congestion_control = hybla" >> /etc/sysctl.conf
-    echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_fastopen = 3" >> /etc/sysctl.conf
-
-    echo "*               soft    nofile           512000" >> /etc/security/limits.conf
-    echo "*               hard    nofile          1024000" >> /etc/security/limits.conf
-
-    echo "session required pam_limits.so" >> /etc/pam.d/common-session
-
-    echo "ulimit -SHn 1024000" >> /etc/profile
+check_sys_bbrplus(){
+	check_version
+	if [[ "${release}" == "centos" ]]; then
+		if [[ ${version} -ge "6" ]]; then
+			installbbrplus
+		else
+			echo -e "${Error} BBRplus内核不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+		fi
+	elif [[ "${release}" == "debian" ]]; then
+		if [[ ${version} -ge "8" ]]; then
+			installbbrplus
+		else
+			echo -e "${Error} BBRplus内核不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+		fi
+	elif [[ "${release}" == "ubuntu" ]]; then
+		if [[ ${version} -ge "14" ]]; then
+			installbbrplus
+		else
+			echo -e "${Error} BBRplus内核不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+		fi
+	else
+		echo -e "${Error} BBRplus内核不支持当前系统 ${release} ${version} ${bit} !" && exit 1
+	fi
 }
 
-init_firewall() {
-    iptables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-}
-
-check_install_path() {
-    ins_path=`pwd`
-    echo $ins_path > /root/tenon.path
+startbbrplus(){
+	echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+	echo "net.ipv4.tcp_congestion_control=bbrplus" >> /etc/sysctl.conf
+	sysctl -p
 }
 
 keep_auto_start() {
@@ -109,16 +106,10 @@ keep_auto_start() {
     echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
 }
 
-install(){
-        check_install_path
-	check_system
-	check_root
-	check_kvm
-	check_kernel
-	init_config
-	init_firewall
-        keep_auto_start
-	reboot
-}
-
-install
+check_sys
+check_version
+[[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
+check_sys_bbrplus
+startbbrplus
+keep_auto_start
+reboot
