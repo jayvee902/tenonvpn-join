@@ -106,10 +106,16 @@ keep_auto_start() {
     echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
 }
 
+check_install_path() {
+    ins_path=`pwd`
+    echo $ins_path > /root/tenon.path
+}
+
 check_sys
 check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 check_sys_bbrplus
 startbbrplus
+check_install_path
 keep_auto_start
 reboot
