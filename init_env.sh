@@ -5,18 +5,26 @@ export PATH
 check_sys(){
 	if [[ -f /etc/redhat-release ]]; then
 		release="centos"
+		yum install -y grub2
+	        grub2-mkconfig -o /boot/grub2/grub.cfg
 	elif cat /etc/issue | grep -q -E -i "debian"; then
 		release="debian"
+		apt-get install -y grub2
 	elif cat /etc/issue | grep -q -E -i "ubuntu"; then
 		release="ubuntu"
+		apt-get install -y grub2
 	elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
 		release="centos"
+		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "debian"; then
 		release="debian"
+		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "ubuntu"; then
 		release="ubuntu"
+		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
 		release="centos"
+		apt-get install -y grub2
     fi
 }
 
@@ -109,6 +117,11 @@ keep_auto_start() {
 check_install_path() {
     ins_path=`pwd`
     echo $ins_path > /root/tenon.path
+}
+
+check_grub() {
+	yum install -y grub2
+	grub2-mkconfig -o /boot/grub2/grub.cfg
 }
 
 check_sys

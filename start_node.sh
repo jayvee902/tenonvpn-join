@@ -27,7 +27,7 @@ check_status(){
 }
 
 replace_ip() {
-    ip=`/sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:"`
+    ip=`/sbin/ifconfig -a|grep inet|grep -v ".1  netmask"|grep -v inet6|awk '{print $2}'|tr -d "addr:"`
     sed -i 's/replace_local_ip/'$ip'/g' ./node/conf/lego.conf
 }
 
