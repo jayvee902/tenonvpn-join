@@ -51,6 +51,7 @@ BBR_grub(){
         fi
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
         /usr/sbin/update-grub
+	apt-get install -y sudo
     fi
 }
 
@@ -102,24 +103,37 @@ keep_auto_start() {
     rand_s=`tr -dc "0-9" < /dev/urandom | head -c 2`
     rand_m=`echo $rand_s | awk '{print int($0)}'`
     rand_mb=$(( $rand_m % 60 ))
-    echo "* * * * * cd /root && sudo sh check_net.sh" >> /var/spool/cron/root
-    echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
+    echo "* * * * * cd /root && sudo bash check_net.sh" > /var/spool/cron/root
+    echo "${rand_mb} 13 * * * cd /root && sudo bash restart.sh" >> /var/spool/cron/root
     crontab -u root /var/spool/cron/root
 }
 
 cp_bin() {
     if [[ "${release}" == "centos" ]]; then
         cp ./pkgs/centos/net ./node
+    elif [[ "${release}" == "debian" ]]; then
+        cp ./pkgs/debian9/net ./node
+        cp ./pkgs/lib*.so* ./node
+    elif [[ "${release}" == "ubuntu" ]]; then
+        cp -rf ./pkgs/debian9/net ./node
+	cp -rf ./pkgs/lib*.so* ./node	
     else
-        cp ./pkgs/debian/net ./node
+        echo "not support."
     fi
 }
 
+check_install_path() {
+    ins_path=`pwd`
+    echo $ins_path > /root/tenon.path
+}
+
 check_sys
+echo ${release}
 check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 check_sys_bbrplus
 startbbrplus
+check_install_path
 keep_auto_start
 cp_bin
 reboot

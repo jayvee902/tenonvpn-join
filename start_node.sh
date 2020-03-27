@@ -32,10 +32,8 @@ replace_ip() {
 }
 
 start(){
-    install_ko
-    init_sys
     replace_ip
-    check_status
+    export LD_LIBRARY_PATH="`pwd`":$LD_LIBRARY_PATH
     cd ./node && nohup ./net -f 0 -g 0 &
 }
 
