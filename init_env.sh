@@ -111,12 +111,15 @@ keep_auto_start() {
 cp_bin() {
     if [[ "${release}" == "centos" ]]; then
         cp ./pkgs/centos/net ./node
+        yum install -y net-tools
     elif [[ "${release}" == "debian" ]]; then
         cp ./pkgs/debian9/net ./node
         cp ./pkgs/lib*.so* ./node
+        apt-get install -y net-tools
     elif [[ "${release}" == "ubuntu" ]]; then
         cp -rf ./pkgs/debian9/net ./node
 	cp -rf ./pkgs/lib*.so* ./node	
+        apt-get install -y net-tools
     else
         echo "not support."
     fi
