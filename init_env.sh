@@ -5,26 +5,18 @@ export PATH
 check_sys(){
 	if [[ -f /etc/redhat-release ]]; then
 		release="centos"
-		yum install -y grub2
-	        grub2-mkconfig -o /boot/grub2/grub.cfg
 	elif cat /etc/issue | grep -q -E -i "debian"; then
 		release="debian"
-		apt-get install -y grub2
 	elif cat /etc/issue | grep -q -E -i "ubuntu"; then
 		release="ubuntu"
-		apt-get install -y grub2
 	elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
 		release="centos"
-		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "debian"; then
 		release="debian"
-		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "ubuntu"; then
 		release="ubuntu"
-		apt-get install -y grub2
 	elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
 		release="centos"
-		apt-get install -y grub2
     fi
 }
 
@@ -112,16 +104,15 @@ keep_auto_start() {
     rand_mb=$(( $rand_m % 60 ))
     echo "* * * * * cd /root && sudo sh check_net.sh" >> /var/spool/cron/root
     echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
+    crontab -u root /var/spool/cron/root
 }
 
-check_install_path() {
-    ins_path=`pwd`
-    echo $ins_path > /root/tenon.path
-}
-
-check_grub() {
-	yum install -y grub2
-	grub2-mkconfig -o /boot/grub2/grub.cfg
+cp_bin() {
+    if [[ "${release}" == "centos" ]]; then
+        cp ./pkgs/centos/net ./node
+    else
+        cp ./pkgs/debian/net ./node
+    fi
 }
 
 check_sys
@@ -129,6 +120,6 @@ check_version
 [[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && [[ ${release} != "centos" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 check_sys_bbrplus
 startbbrplus
-check_install_path
 keep_auto_start
+cp_bin
 reboot
