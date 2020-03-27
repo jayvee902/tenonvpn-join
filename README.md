@@ -1,7 +1,7 @@
 
 
 ##### Third-party nodes join us, one-click startup, and join in the decentralized Tenon VPN network, providing services and routing
-##### Currently supports: centos 7, debian, ubuntu ...
+##### Currently supports: centos, debian, ubuntu ...
 
 ## Access steps
 ### 1. Download the code:
@@ -20,7 +20,7 @@
 
 第三方节点接入，一键式启动，并接入去中心化Tenon VPN网络，提供服务和路由
 
-当前支持： centos 7, debian, ubuntu ...
+当前支持： centos, debian, ubuntu ...
 
 
 ## 接入步骤
