@@ -6,7 +6,7 @@
 ## Access steps
 ### 1. Download the code:
 
-      git https://github.com/tenondvpn/tenonvpn-join.git
+      git clone https://github.com/tenondvpn/tenonvpn-join.git
       or
       wget https://github.com/tenondvpn/tenonvpn-join/archive/1.1.1.zip
 
