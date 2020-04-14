@@ -43,6 +43,7 @@ BBR_grub(){
             fi
             sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
         elif [[ ${version} = "7" ]]; then
+            grub2-mkconfig --output=/boot/grub2/grub.cfg 
             if [ ! -f "/boot/grub2/grub.cfg" ]; then
                 echo -e "${Error} /boot/grub2/grub.cfg 找不到，请检查."
                 exit 1
