@@ -34,7 +34,8 @@
    
 
 ### 2. 初始化环境，执行完成后会重启系统，程序也会自动启动
-      bash init_env.sh  
+      Centos运行命令:     sh init_env.sh  
+                其他:     bash init_env.sh  
 
     
     
