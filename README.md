@@ -13,7 +13,8 @@
 
 ### 2. init system, system will restart after execution， node will start automatically
 
-      bash init_env.sh
+         Centos:     sh init_env.sh  
+          other:     bash init_env.sh  
 
 
 # 
