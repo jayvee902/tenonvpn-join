@@ -104,8 +104,13 @@ keep_auto_start() {
     rand_s=`tr -dc "0-9" < /dev/urandom | head -c 2`
     rand_m=`echo $rand_s | awk '{print int($0)}'`
     rand_mb=$(( $rand_m % 60 ))
-    echo "* * * * * cd /root && sudo bash check_net.sh" > /var/spool/cron/root
-    echo "${rand_mb} 13 * * * cd /root && sudo bash restart.sh" >> /var/spool/cron/root
+    if [[ "${release}" == "centos" ]]; then
+        echo "* * * * * cd /root && sudo sh check_net.sh" > /var/spool/cron/root
+        echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
+    else
+        echo "* * * * * cd /root && sudo bash check_net.sh" > /var/spool/cron/root
+        echo "${rand_mb} 13 * * * cd /root && sudo bash restart.sh" >> /var/spool/cron/root
+    fi
     crontab -u root /var/spool/cron/root
 }
 
