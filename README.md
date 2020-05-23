@@ -9,8 +9,7 @@
 
       git clone https://github.com/tenondvpn/tenonvpn-join.git
       or
-      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.1.5.zip
-
+      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.1.7.tar.gz
 ### 2. init system, system will restart after execution， node will start automatically
 
          Centos:     sh init_env.sh  
@@ -31,7 +30,7 @@
   
       git clone https://github.com/tenondvpn/tenonvpn-join.git
       或者
-      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.1.5.zip
+      wget https://github.com/tenondvpn/tenonvpn-join/archive/1.1.7.tar.gz
    
 
 ### 2. 初始化环境，执行完成后会重启系统，程序也会自动启动
