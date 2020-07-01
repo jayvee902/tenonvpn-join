@@ -106,7 +106,7 @@ keep_auto_start() {
     rand_m=`echo $rand_s | awk '{print int($0)}'`
     rand_mb=$(( $rand_m % 60 ))
     echo "* * * * * cd /root && sudo sh check_net.sh" >> /var/spool/cron/root
-    echo "${rand_mb} 13 * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
+    echo "${rand_mb} * * * * cd /root && sudo sh restart.sh" >> /var/spool/cron/root
 }
 
 install(){
