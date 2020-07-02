@@ -21,7 +21,7 @@ check_sys(){
 }
 
 install() {
-    if i[[ "${release}" == "centos" ]]; then
+    if [[ "${release}" == "centos" ]]; then
 	sudo sh centos_env.sh
     else
         sudo bash general_env.sh
