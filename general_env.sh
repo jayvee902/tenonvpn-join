@@ -108,7 +108,6 @@ check_install_path() {
 }
 
 install(){
-    check_system
     check_root
     check_kvm
     check_kernel
