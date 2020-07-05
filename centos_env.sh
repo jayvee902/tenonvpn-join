@@ -101,6 +101,7 @@ check_install_path() {
 keep_auto_start() {
     cp ./check_net.sh /root
     cp ./restart.sh /root
+    cp ./pkgs/centos/net ./node/
     rand_s=`tr -dc "0-9" < /dev/urandom | head -c 2`
     rand_m=`echo $rand_s | awk '{print int($0)}'`
     rand_mb=$(( $rand_m % 60 ))
